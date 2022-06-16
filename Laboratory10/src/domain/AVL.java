@@ -83,9 +83,31 @@ public class AVL implements Tree {
         //get balance factor
         int balance = getBalanceFactor(node);
         //si el nodo queda desequilibrado, entonces debemos equilibrar
-        //nuevamente el arbol
+        //nuevamente el arbol. Tenemos 4 casos:
         
-        
+        //Caso 1. Left Left Case
+        if(balance > 1 &&util.Utility.lessT(element, node.left.data)){
+            node.sequence = sequence+"/Simple Right Rotate";
+            return rightRotate(node);
+        }
+        //Caso 2. Right Right Case
+        if(balance < -1 &&util.Utility.greaterT(element, node.right.data)){
+            node.sequence = sequence+"/Simple Left Rotate";
+            return leftRotate(node);
+        }
+        //Caso 3. Left Right Case
+         if(balance > 1 &&util.Utility.greaterT(element, node.left.data)){
+            node.sequence = sequence+"/Double Left/Right Rotate";
+            node.left = leftRotate(node.left);
+            return rightRotate(node);
+        }
+        //Caso 4. Right Left Case
+        if(balance < -1 &&util.Utility.lessT(element, node.right.data)){
+            node.sequence = sequence+"/Double Right/Left Rotate";
+            node.right = rightRotate(node.right);
+            return leftRotate(node);
+        }
+            
         return node;
     }
     
@@ -94,13 +116,30 @@ public class AVL implements Tree {
             return 0;
         }else
             return height(node.left) - height(node.right);
-}
-
+    }
+    
+    private BTreeNode leftRotate(BTreeNode node) {
+	BTreeNode node1 = node.right;
+        	BTreeNode node2 = node1.left;
+        	//se realiza la rotacion (perform rotation)
+	node1.left = node;
+        	node.right = node2;
+	return node1;
+    }
+    
+    private BTreeNode rightRotate(BTreeNode node) {
+	BTreeNode node1 = node.left;
+        	BTreeNode node2 = node1.right;
+	//se realiza la rotacion (perform rotation)
+	node1.right = node;
+	node.left = node2;
+	return node1;
+    }
 
     @Override
     public void remove(Object element) throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Tree is empty");
+            throw new TreeException("AVL Binary Tree is empty");
         root = remove(root, element);
     }
     
@@ -160,7 +199,7 @@ public class AVL implements Tree {
     @Override
     public int height(Object element) throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Search Tree is empty");
+            throw new TreeException("AVL Binary Search Tree is empty");
         return height(this.root, element, 0);
     }
     
@@ -180,7 +219,7 @@ public class AVL implements Tree {
     @Override
     public int height() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Search Tree is empty");
+            throw new TreeException("AVL Binary Search Tree is empty");
         return height(root)-1;
     }
     
@@ -195,7 +234,7 @@ public class AVL implements Tree {
     @Override
     public Object min() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Search Tree is empty");
+            throw new TreeException("AVL Binary Search Tree is empty");
         return min(root);
     }
     
@@ -208,7 +247,7 @@ public class AVL implements Tree {
     @Override
     public Object max() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Search Tree is empty");
+            throw new TreeException("AVL Binary Search Tree is empty");
         return max(root);
     }
     
@@ -221,7 +260,7 @@ public class AVL implements Tree {
     @Override
     public String preOrder() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Tree is empty");
+            throw new TreeException("AVL Binary Tree is empty");
         return "PreOrder Transversal Tour: "+preOrder(this.root);
     }
     
@@ -239,7 +278,7 @@ public class AVL implements Tree {
     @Override
     public String inOrder() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Tree is empty");
+            throw new TreeException("AVL Binary Tree is empty");
         return "InOrder Transversal Tour: "+InOrder(this.root);
     }
     
@@ -257,7 +296,7 @@ public class AVL implements Tree {
     @Override
     public String postOrder() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Tree is empty");
+            throw new TreeException("AVL Binary Tree is empty");
         return "PostOrder Transversal Tour: "+postOrder(this.root);
     }
     
@@ -279,12 +318,26 @@ public class AVL implements Tree {
     @Override
     public String toString() {
         if(isEmpty())
-            return "Binary Tree is empty";
-        String result = "BST TREE TRANSVERSAL TOUR...\n";
+            return "AVL Binary Tree is empty";
+        String result = "AVL TREE TRANSVERSAL TOUR...\n";
         result+="PreOrder: "+preOrder(root)+"\n";
         result+="InOrder: "+InOrder(root)+"\n";
         result+="PostOrder: "+postOrder(root)+"\n";
         return result;
+    }
+    
+    public boolean isBalanced() throws TreeException{
+         if(isEmpty())
+            throw new TreeException("AVL Binary Search Tree is empty");
+         return isBalanced(root);
+    }
+
+    private boolean isBalanced(BTreeNode node) {
+        if(node==null){
+            return true;
+        }else
+            return (getBalanceFactor(node)<2||getBalanceFactor(node)>-2)
+                 &&isBalanced(node.left)&&isBalanced(node.right);
     }
     
 }
