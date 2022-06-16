@@ -60,11 +60,11 @@ public interface Tree {
     //para mostrar todos los elementos existentes en el arbol
     public String inOrder() throws TreeException;
     //Tranversal Tour: L-N-R
-    //private String InOrder(BTreeNode node)
+    //private String inOrder(BTreeNode node)
     
     ////recorre el árbol de la forma: left-right-node, 
     //para mostrar todos los elementos existentes
     public String postOrder() throws TreeException; 
-    
+    //Tranversal Tour: L-R-N
     //private String postOrder(BTreeNode node)
 }

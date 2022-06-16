@@ -8,11 +8,11 @@ package domain;
  *
  * @author Profesor Gilberth Chaves A <gchavesav@ucr.ac.cr>
  */
-public class BTree implements Tree {
+public class BST implements Tree {
     private BTreeNode root; //representa la unica entrada al arbol
 
     //Constructor
-    public BTree(){
+    public BST(){
         this.root = null;
     }
     
@@ -23,7 +23,7 @@ public class BTree implements Tree {
     @Override
     public int size() throws TreeException {
         if(isEmpty()){
-            throw new TreeException("Binary Tree is empty");
+            throw new TreeException("Binary Search Tree is empty");
         }
         return size(root);
     }
@@ -59,45 +59,26 @@ public class BTree implements Tree {
             if(util.Utility.equals(node.data, element)){
                 return true;
             }else
-                return binarySearch(node.left, element)||
-                        binarySearch(node.right, element);
+                if(util.Utility.lessT(element, node.data))
+                    return binarySearch(node.left, element);
+                else binarySearch(node.right, element);
+        return false;
     }
 
     @Override
     public void add(Object element) {
-        //this.root = add(this.root, element);
-        this.root = add(this.root, element, "root");
+        this.root = add(this.root, element);
     }
     
     private BTreeNode add(BTreeNode node, Object element){
         if(node==null){
             node = new BTreeNode(element);
         }else
-            if(node.left==null){
+            if(util.Utility.lessT(element, node.data))
                 node.left = add(node.left, element);
-            }else
-                if(node.right==null){
+            else
+            if(util.Utility.greaterT(element, node.data))  
                     node.right = add(node.right, element);
-                }else{ //debemos establecer algun criterio para insertar
-                    int value = util.Utility.random(99);
-                    if(value%2==0){ //si el valor es par baje un nivel por la izq
-                        node.left = add(node.left, element);
-                    }else
-                        node.right = add(node.right, element);
-                }
-        return node;
-    }
-    
-     private BTreeNode add(BTreeNode node, Object element, String label){
-        if(node==null){
-            node = new BTreeNode(element, label);
-        }else{ //debemos establecer algun criterio para insertar
-            int value = util.Utility.random(99);
-            if(value%2==0){ //si el valor es par baje un nivel por la izq
-                node.left = add(node.left, element, label+"/left");
-            }else
-                node.right = add(node.right, element, label+"/right");
-            }
         return node;
     }
 
@@ -110,6 +91,12 @@ public class BTree implements Tree {
     
     private BTreeNode remove(BTreeNode node, Object element){
         if(node!=null){
+            if(util.Utility.lessT(element, node.data))
+                node.left = remove(node.left, element);
+            else
+            if(util.Utility.greaterT(element, node.data))
+                node.right = remove(node.right, element);
+            else
             if(util.Utility.equals(node.data, element)){
                 //Caso 1. El nodo a suprimir no tiene hijos
                 if(node.left==null && node.right==null){
@@ -124,13 +111,11 @@ public class BTree implements Tree {
                 }else
                 //Caso 3. El nodo a suprimir tiene dos hijos
                 if(node.left!=null && node.right!=null){
-                    Object value = getLeaf(node.right);
-                    node.data = value;
-                    node.right = removeLeaf(node.right, value);
+                    Object min = min(node.right);
+                    node.data = min;
+                    node.right = remove(node.right, min);
                 }
-            }
-            node.left = remove(node.left, element);
-            node.right = remove(node.right, element);
+            } 
         }
         return node;
     }
@@ -156,32 +141,11 @@ public class BTree implements Tree {
             }
         return aux;
     }
-    
-    
-    /**
-     * Remueve hoja
-     * @param node
-     * @param value
-     * @return 
-     */
-    private BTreeNode removeLeaf(BTreeNode node, Object value) {
-        if(node==null)
-            return null;
-	else
-            if(node.left==null && node.right==null 
-                    &&util.Utility.equals(node.data, value))
-		return null; //es una hoja y la elimina
-            else{
-                node.left = removeLeaf(node.left, value);
-                node.right = removeLeaf(node.right, value);
-            }
-        return node;
-    }
 
     @Override
     public int height(Object element) throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Tree is empty");
+            throw new TreeException("Binary Search Tree is empty");
         return height(this.root, element, 0);
     }
     
@@ -192,15 +156,16 @@ public class BTree implements Tree {
             if(util.Utility.equals(node.data, element)){
                 return counter;
             }else
-                //debemos buscar por el subarbol izq y der
-                return Math.max(height(node.left, element, ++counter), 
-                                height(node.right, element, counter));
+            if(util.Utility.lessT(element, node.data)){
+                return height(node.left, element, ++counter);
+            }
+               return height(node.right, element, ++counter);
     }
 
     @Override
     public int height() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Tree is empty");
+            throw new TreeException("Binary Search Tree is empty");
         return height(root)-1;
     }
     
@@ -209,17 +174,33 @@ public class BTree implements Tree {
             return 0;
         }else
             //debemos buscar por el subarbol izq y der
-            return Math.max(height(node.left), height(node.right)+1);
+            return Math.max(height(node.left), height(node.right))+1;
     }
 
     @Override
     public Object min() throws TreeException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if(isEmpty())
+            throw new TreeException("Binary Search Tree is empty");
+        return min(root);
+    }
+    
+    private Object min(BTreeNode node){
+        if(node.left!=null)
+            return min(node.left);
+        return node.data; //ya estamos en la hoja q represeta el min
     }
 
     @Override
     public Object max() throws TreeException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if(isEmpty())
+            throw new TreeException("Binary Search Tree is empty");
+        return max(root);
+    }
+    
+     private Object max(BTreeNode node){
+        if(node.right!=null)
+            return max(node.right);
+        return node.data; //ya estamos en la hoja q represeta el max
     }
 
     @Override
@@ -233,8 +214,7 @@ public class BTree implements Tree {
     private String preOrder(BTreeNode node){
         String result="";
         if(node!=null){
-            //result=node.data+", ";
-            result=node.data+"("+node.label+"), ";
+            result=node.data+", ";
             result+=preOrder(node.left);
             result+=preOrder(node.right);
         }
@@ -285,10 +265,10 @@ public class BTree implements Tree {
     public String toString() {
         if(isEmpty())
             return "Binary Tree is empty";
-        String result = "BINARY TREE TOUR...\n";
-        result+="PreOrder Transversal Tour: "+preOrder(root)+"\n";
-        result+="InOrder Transversal Tour: "+InOrder(root)+"\n";
-        result+="PostOrder Transversal Tour: "+postOrder(root)+"\n";
+        String result = "BST TREE TRANSVERSAL TOUR...\n";
+        result+="PreOrder: "+preOrder(root)+"\n";
+        result+="InOrder: "+InOrder(root)+"\n";
+        result+="PostOrder: "+postOrder(root)+"\n";
         return result;
     }
     
