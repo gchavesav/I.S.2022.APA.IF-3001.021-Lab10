@@ -8,11 +8,11 @@ package domain;
  *
  * @author Profesor Gilberth Chaves A <gchavesav@ucr.ac.cr>
  */
-public class BST implements Tree {
+public class AVL implements Tree {
     private BTreeNode root; //representa la unica entrada al arbol
 
     //Constructor
-    public BST(){
+    public AVL(){
         this.root = null;
     }
     
@@ -23,7 +23,7 @@ public class BST implements Tree {
     @Override
     public int size() throws TreeException {
         if(isEmpty()){
-            throw new TreeException("Binary Search Tree is empty");
+            throw new TreeException("AVL Binary Search Tree is empty");
         }
         return size(root);
     }
@@ -48,7 +48,7 @@ public class BST implements Tree {
     @Override
     public boolean contains(Object element) throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Tree is empty");
+            throw new TreeException("AVL Binary Tree is empty");
         return binarySearch(root, element);
     }
     
@@ -67,20 +67,35 @@ public class BST implements Tree {
 
     @Override
     public void add(Object element) {
-        this.root = add(this.root, element);
+        this.root = add(this.root, element, "root");
     }
     
-    private BTreeNode add(BTreeNode node, Object element){
+    private BTreeNode add(BTreeNode node, Object element, String sequence){
         if(node==null){
-            node = new BTreeNode(element);
+            node = new BTreeNode(element, sequence);
         }else
             if(util.Utility.lessT(element, node.data))
-                node.left = add(node.left, element);
+                node.left = add(node.left, element, sequence+"/left");
             else
             if(util.Utility.greaterT(element, node.data))  
-                    node.right = add(node.right, element);
+                    node.right = add(node.right, element, sequence+"/right");
+        
+        //get balance factor
+        int balance = getBalanceFactor(node);
+        //si el nodo queda desequilibrado, entonces debemos equilibrar
+        //nuevamente el arbol
+        
+        
         return node;
     }
+    
+    private int getBalanceFactor(BTreeNode node){
+        if(node==null){
+            return 0;
+        }else
+            return height(node.left) - height(node.right);
+}
+
 
     @Override
     public void remove(Object element) throws TreeException {
@@ -206,7 +221,7 @@ public class BST implements Tree {
     @Override
     public String preOrder() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Search Tree is empty");
+            throw new TreeException("Binary Tree is empty");
         return "PreOrder Transversal Tour: "+preOrder(this.root);
     }
     
@@ -224,7 +239,7 @@ public class BST implements Tree {
     @Override
     public String inOrder() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Search Tree is empty");
+            throw new TreeException("Binary Tree is empty");
         return "InOrder Transversal Tour: "+InOrder(this.root);
     }
     
@@ -242,7 +257,7 @@ public class BST implements Tree {
     @Override
     public String postOrder() throws TreeException {
         if(isEmpty())
-            throw new TreeException("Binary Search Tree is empty");
+            throw new TreeException("Binary Tree is empty");
         return "PostOrder Transversal Tour: "+postOrder(this.root);
     }
     
@@ -264,7 +279,7 @@ public class BST implements Tree {
     @Override
     public String toString() {
         if(isEmpty())
-            return "Binary Search Tree is empty";
+            return "Binary Tree is empty";
         String result = "BST TREE TRANSVERSAL TOUR...\n";
         result+="PreOrder: "+preOrder(root)+"\n";
         result+="InOrder: "+InOrder(root)+"\n";

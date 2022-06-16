@@ -11,7 +11,7 @@ package domain;
 public class BTreeNode {
     public Object data;
     public BTreeNode left, right;
-    public String label; //representa la ruta donde agrego el elemento
+    public String sequence; //representa la ruta donde agrego el elemento
     
     //Constructor
     public BTreeNode(Object data){
@@ -20,9 +20,9 @@ public class BTreeNode {
     }
     
     //Constructor 2
-    public BTreeNode(Object data, String label){
+    public BTreeNode(Object data, String sequence){
         this.data = data;
-        this.label = label;
+        this.sequence = sequence;
         this.left=this.right=null;
     }
 }
