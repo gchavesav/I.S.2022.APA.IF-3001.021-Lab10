@@ -336,7 +336,7 @@ public class AVL implements Tree {
         if(node==null){
             return true;
         }else
-            return (getBalanceFactor(node)<2||getBalanceFactor(node)>-2)
+            return (getBalanceFactor(node)<2&&getBalanceFactor(node)>-2)
                  &&isBalanced(node.left)&&isBalanced(node.right);
     }
     
